@@ -1,0 +1,84 @@
+{
+  "name": "NutriKids",
+  "short_name": "NutriKids",
+  "description": "Planejamento Semanal de Nutrição Infantil",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#6200ee",
+  "orientation": "portrait-primary", 
+  "scope": "/",
+  "categories": ["health", "nutrition", "family"], 
+  "lang": "pt-BR", 
+  "dir": "ltr", 
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshots/desktop.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Novo Plano Semanal",
+      "short_name": "Novo Plano",
+      "description": "Criar novo plano nutricional",
+      "url": "/novo-plano",
+      "icons": [{ "src": "icons/plus-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Meus Planos",
+      "short_name": "Planos",
+      "description": "Visualizar planos salvos",
+      "url": "/planos",
+      "icons": [{ "src": "icons/list-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.example.nutrikids",
+      "id": "com.example.nutrikids"
+    }
+  ],
+  "prefer_related_applications": false, 
+  "protocol_handlers": [ 
+    {
+      "protocol": "web+nutrikids",
+      "url": "/?protocol=%s"
+    }
+  ]
+}
