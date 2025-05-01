@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplicativo para planejamento alimentar escolar - NutriKids">
+    <meta name="theme-color" content="#e74c3c">
+    <link rel="manifest" href="/manifest.json">
+    <title>NutriKids - Planejamento Alimentar Escolar</title>
+    <style>
+        /* ====== VARIÁVEIS GLOBAIS ====== */
+        :root {
+            /* Cores */
+            --primary-color: #e74c3c;
+            --primary-dark: #c0392b;
+            --light-gray: #ecf0f1;
+            --medium-gray: #bdc3c7;
+            --dark-gray: #333;
+            --white: #fff;
+            --warning-bg: #fff8e1;
+            --warning-border: #f39c12;
+            
+            /* Espaçamentos */
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            
+            /* Bordas */
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-full: 9999px;
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+            
+            /* Transições */
+            --transition-fast: all 0.2s ease;
+        }
+
+        /* ====== RESET E ESTILOS BASE ====== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, 
+                         Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            color: var(--dark-gray);
+            background-color: #f5f5f5;
+            padding: var(--space-md);
+        }
+
+        h1, h2, h3 {
+            margin-bottom: var(--space-md);
+            font-weight: 600;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* ====== LAYOUT PRINCIPAL ====== */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        /* ====== SELEÇÃO DE DIAS ====== */
+        .week-days {
+            display: flex;
+            gap: var(--space-sm);
+            overflow-x: auto;
+            padding-bottom: var(--space-sm);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--light-gray);
+        }
+
+        .week-days::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .week-days::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: var(--border-radius-full);
+        }
+
+        .day-card {
+            padding: var(--space-md) var(--space-sm);
+            background: var(--light-gray);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            text-align: center;
+            min-width: 80px;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            transition: var(--transition-fast);
+        }
+
+        .day-card.selected {
+            background: var(--primary-color);
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        .day-card.today {
+            border: 2px solid var(--primary-color);
+        }
+
+        /* ====== CARDÁPIO ====== */
+        .menu-container {
+            background: var(--white);
+            padding: var(--space-md);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .menu-item {
+            display: inline-block;
+            padding: var(--space-sm) var(--space-md);
+            margin: var(--space-sm);
+            background: var(--light-gray);
+            border-radius: var(--border-radius-full);
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+        }
+
+        .menu-item.selected {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* ====== SELETOR DE BISCOITO ====== */
+        .biscuit-selector {
+            display: none;
+            background: var(--warning-bg);
+            padding: var(--space-md);
+            border-radius: var(--border-radius-md);
+            margin: var(--space-md) 0;
+            border-left: 4px solid var(--warning-border);
+        }
+
+        .biscuit-selector select {
+            width: 100%;
+            padding: var(--space-sm);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--medium-gray);
+            margin-top: var(--space-sm);
+            font-size: 1rem;
+            background: var(--white);
+        }
+
+        /* ====== CONTROLES ====== */
+        .controls {
+            margin-top: var(--space-lg);
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+
+        .controls input {
+            padding: var(--space-md);
+            width: 120px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--medium-gray);
+            font-size: 1rem;
+            flex-grow: 1;
+        }
+
+        .calculate-btn {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            flex-shrink: 0;
+            transition: var(--transition-fast);
+        }
+
+        .calculate-btn:active {
+            background: var(--primary-dark);
+            transform: scale(0.98);
+        }
+
+        /* ====== RESULTADOS ====== */
+        .results {
+            background: var(--white);
+            padding: var(--space-md);
+            border-radius: var(--border-radius-lg);
+            margin-top: var(--space-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .food-result {
+            margin: var(--space-md) 0;
+            padding: var(--space-md);
+            background: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .error-message {
+            color: var(--primary-color);
+        }
+
+        /* ====== BOTÃO INSTALAR PWA ====== */
+        .pwa-install-btn {
+            position: fixed;
+            bottom: var(--space-md);
+            right: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-fast);
+        }
+
+        .pwa-install-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ====== RESPONSIVIDADE ====== */
+        @media (min-width: 768px) {
+            body {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: var(--space-lg);
+            }
+            
+            .main-container {
+                flex-direction: row;
+            }
+            
+            .week-days {
+                flex-direction: column;
+                min-width: 120px;
+            }
+            
+            .day-card {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>NutriKids - Planejamento Semanal</h1>
+    
+    <div class="main-container">
+        <!-- Seletor de Dias da Semana -->
+        <div class="week-days">
+            <div class="day-card" data-day="segunda">Segunda</div>
+            <div class="day-card" data-day="terca">Terça</div>
+            <div class="day-card" data-day="quarta">Quarta</div>
+            <div class="day-card" data-day="quinta">Quinta</div>
+            <div class="day-card" data-day="sexta">Sexta</div>
+        </div>
+        
+        <!-- Cardápio e Controles -->
+        <div class="menu-container" id="menu-options">
+            <h3>Itens do Cardápio:</h3>
+            <!-- Itens serão inseridos dinamicamente pelo JavaScript -->
+            
+            <div class="controls">
+                <input type="number" id="children-count" placeholder="N° crianças" min="1" inputmode="numeric">
+                <button id="calculate" class="calculate-btn">Calcular</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Seletor de Biscoito (aparece apenas quando necessário) -->
+    <div class="biscuit-selector" id="biscuit-selector-container">
+        <label for="biscuit-type">Tipo de Biscoito:</label>
+        <select id="biscuit-type">
+            <option value="doce">Doce</option>
+            <option value="salgado">Salgado</option>
+        </select>
+    </div>
+    
+    <!-- Resultados -->
+    <div class="results" id="results"></div>
+
+    <script>
+        /**
+         * ====== CONSTANTES E CONFIGURAÇÕES ======
+         */
+        
+        // Dias da semana
+        const WEEK_DAYS = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sábado'];
+        
+        // Tipos de biscoito disponíveis
+        const BISCUIT_TYPES = {
+            SWEET: 'doce',
+            SALTED: 'salgado'
+        };
+        
+        // Banco de dados de cardápios (ATUALIZADO)
+        const MENU_DATA = {
+            segunda: {
+                "Arroz": { portion: 100, unit: "g" },
+                "Feijão": { portion: 70, unit: "g" },
+                "Carne moída": { portion: 10, unit: "g" }
+            },
+            terca: {
+                "Suco de laranja": { portion: 200, unit: "ml" },
+                "Biscoito": { 
+                    portion: 2, 
+                    unit: "unidades",
+                    types: {
+                        "doce": ["Maizena", "Recheado"],
+                        "salgado": ["Cream Cracker", "Água e Sal"]
+                    }
+                },
+                "Fruta": { portion: 1, unit: "unidade" }
+            },
+            quarta: {
+                "Macarrão": { portion: 120, unit: "g" },
+                "Molho de tomate": { portion: 80, unit: "g" }
+            },
+            quinta: {
+                "Arroz integral": { portion: 150, unit: "g" },
+                "Frango grelhado": { portion: 100, unit: "g" }
+            },
+            sexta: {
+                "Purê de batata": { portion: 150, unit: "g" },
+                "Omelete": { portion: 2, unit: "ovos" }
+            }
+        };
+        
+        /**
+         * ====== ESTADO DA APLICAÇÃO ======
+         */
+        const appState = {
+            selectedDay: null,
+            biscuitType: BISCUIT_TYPES.SWEET,
+            childrenCount: 0
+        };
+        
+        /**
+         * ====== FUNÇÕES UTILITÁRIAS ======
+         */
+        
+        /**
+         * Obtém o dia atual da semana
+         * @returns {string} Nome do dia da semana (ex: "segunda")
+         */
+        function getCurrentDay() {
+            const todayIndex = new Date().getDay();
+            return WEEK_DAYS[todayIndex];
+        }
+        
+        /**
+         * Formata uma quantidade para exibição (converte g para kg, ml para L quando aplicável)
+         * @param {number} value - Valor a ser formatado
+         * @param {string} unit - Unidade de medida original
+         * @returns {string} Quantidade formatada
+         */
+        function formatQuantity(value, unit) {
+            if (unit === "g" && value >= 1000) {
+                return `${(value / 1000).toFixed(2)} kg`;
+            }
+            if (unit === "ml" && value >= 1000) {
+                return `${(value / 1000).toFixed(2)} L`;
+            }
+            return `${value} ${unit}`;
+        }
+        
+        /**
+         * ====== FUNÇÕES PRINCIPAIS ======
+         */
+        
+        /**
+         * Atualiza as opções do cardápio na interface conforme o dia selecionado
+         */
+        function updateMenuOptions() {
+            const menuContainer = document.getElementById('menu-options');
+            const controls = menuContainer.querySelector('.controls');
+            
+            // Limpa o container mantendo os controles
+            menuContainer.innerHTML = '<h3>Itens do Cardápio:</h3>';
+            menuContainer.appendChild(controls);
+            
+            // Esconde o seletor de biscoito
+            document.getElementById('biscuit-selector-container').style.display = 'none';
+            
+            // Adiciona os itens do cardápio do dia selecionado
+            const dayMenu = MENU_DATA[appState.selectedDay];
+            Object.keys(dayMenu).forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.textContent = item;
+                
+                menuItem.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    
+                    // Mostra/oculta seletor de biscoito se for terça e item for biscoito
+                    if (item === "Biscoito" && appState.selectedDay === "terca") {
+                        const shouldShow = this.classList.contains('selected');
+                        document.getElementById('biscuit-selector-container').style.display = 
+                            shouldShow ? 'block' : 'none';
+                    }
+                });
+                
+                menuContainer.insertBefore(menuItem, controls);
+            });
+        }
+        
+        /**
+         * Calcula as quantidades necessárias dos itens selecionados
+         */
+        function calculateQuantities() {
+            const childrenInput = parseInt(document.getElementById('children-count').value);
+            const resultsContainer = document.getElementById('results');
+        
+            // Validação da quantidade de crianças
+            if (isNaN(childrenInput) || childrenInput < 1) {
+                resultsContainer.innerHTML = '<p class="error-message">Digite um número válido de crianças</p>';
+                return;
+            }
+
+            
+            
+            appState.childrenCount = childrenInput;
+            
+            // Obtém itens selecionados
+            const selectedItems = document.querySelectorAll('.menu-item.selected');
+            
+            if (selectedItems.length === 0) {
+                resultsContainer.innerHTML = '<p class="error-message">Selecione pelo menos um item</p>';
+                return;
+            }
+            
+            // Processa cada item selecionado
+            let resultsHTML = '<h3>Quantidades necessárias:</h3>';
+            
+            selectedItems.forEach(itemElement => {
+                const itemName = itemElement.textContent;
+                const itemData = MENU_DATA[appState.selectedDay][itemName];
+                
+                // Caso especial para biscoitos na terça-feira
+                if (itemName === "Biscoito" && appState.selectedDay === "terca") {
+                    const options = itemData.types[appState.biscuitType].join(', ');
+                    resultsHTML += `
+                        <div class="food-result">
+                            <strong>Biscoito (${appState.biscuitType}):</strong> 
+                            ${formatQuantity(itemData.portion * appState.childrenCount, itemData.unit)}
+                            <small>Opções: ${options}</small>
+                        </div>
+                    `;
+                } else {
+                    // Cálculo padrão para outros itens
+                    resultsHTML += `
+                        <div class="food-result">
+                            <strong>${itemName}:</strong> 
+                            ${formatQuantity(itemData.portion * appState.childrenCount, itemData.unit)}
+                        </div>
+                    `;
+                }
+            });
+            
+            resultsContainer.innerHTML = resultsHTML;
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveSelections() {
+    const selectedItems = [...document.querySelectorAll('.menu-item.selected')].map(el => el.textContent);
+    
+    localStorage.setItem('nutrikids-selections', JSON.stringify({
+        day: appState.selectedDay,
+        items: selectedItems,
+        biscuitType: appState.biscuitType,
+        childrenCount: appState.childrenCount
+    }));
+}
+        
+        /**
+         * ====== INICIALIZAÇÃO ======
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configura o dia inicial (atual ou segunda se for final de semana)
+            const currentDay = getCurrentDay();
+            appState.selectedDay = (currentDay === 'domingo' || currentDay === 'sábado') ? 'segunda' : currentDay;
+            
+            // Marca o dia atual na interface
+            document.querySelectorAll('.day-card').forEach(day => {
+                const dayName = day.getAttribute('data-day');
+                
+                if (dayName === appState.selectedDay) {
+                    day.classList.add('selected', 'today');
+                }
+                
+                // Configura evento de clique para seleção manual
+                day.addEventListener('click', function() {
+                    document.querySelectorAll('.day-card').forEach(d => {
+                        d.classList.remove('selected', 'today');
+                    });
+                    this.classList.add('selected');
+                    appState.selectedDay = this.getAttribute('data-day');
+                    updateMenuOptions();
+                });
+            });
+            
+            // Atualiza as opções do cardápio
+            updateMenuOptions();
+            
+            // Configura o seletor de tipo de biscoito
+            document.getElementById('biscuit-type').addEventListener('change', function() {
+                appState.biscuitType = this.value;
+            });
+            
+            // Configura o botão de cálculo
+            document.getElementById('calculate').addEventListener('click', calculateQuantities);
+            
+            // Validação do input enquanto digita
+            document.getElementById('children-count').addEventListener('input', function(e) {
+                if (e.target.value < 0) e.target.value = '';
+            });
+        });
+
+        /**
+         * ====== PWA INSTALLATION HANDLER ======
+         */
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            const installButton = document.createElement('button');
+            installButton.textContent = 'Instalar NutriKids';
+            installButton.id = 'installButton';
+            installButton.classList.add('pwa-install-btn');
+            
+            installButton.addEventListener('click', () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuário aceitou a instalação');
+                        installButton.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            });
+            
+            document.body.appendChild(installButton);
+        });
+
+        // Verifica se o app já está instalado
+        window.addEventListener('load', () => {
+            if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+                const btn = document.getElementById('installButton');
+                if (btn) btn.style.display = 'none';
+            }
+        });
+
+        /**
+         * ====== SERVICE WORKER REGISTRATION ======
+         */
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado com sucesso!', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('Falha no registro do Service Worker:', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
